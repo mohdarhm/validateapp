@@ -5,11 +5,10 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(response => response.json())
     .then(data => {
         currentIpParagraph.textContent = 'Current IP: ' + data.ip;
-
         // Add event listener to the button for adding to the firewall
         var addButton = document.getElementById('myButton');
         var hiddenText = document.getElementById('hiddenText');
-
+        const btnbg=document.getElementsByClassName('box-1')
         addButton.addEventListener('click', function() {
             // Fetch the response from the Django view for adding to the firewall
             fetch('https://plenary-anagram-408413.el.r.appspot.com/add_ip_to_firewall/', {
@@ -21,18 +20,22 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                console.log(data)
-                hiddenText.textContent = data.message;
+                hiddenText.textContent = data.message || data.error;
                 hiddenText.style.display = 'block';
+                if (data.error) {
+                document.body.style.transition = 'background-color 0.7s ease-in-out';
+                document.body.style.backgroundColor = '#480000';     
+                hiddenText.style.color = 'yellow';
+                } else {
+                document.body.style.transition = 'background-color 0.7s ease-in-out';
+                document.body.style.backgroundColor = '#020047';
+                hiddenText.style.color = '#5eec4b';
+                }
             })
-            .catch(error => {
-                console.log(error)
-                hiddenText.textContent = 'Error allowing user IP: ' + error;
-                hiddenText.style.display = 'block';
-            });
         });
     })
     .catch(error => {
         console.error('Error getting user IP:', error);
+        
     });
 });
