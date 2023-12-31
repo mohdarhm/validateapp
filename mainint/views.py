@@ -39,6 +39,7 @@ def add_ip_to_firewall(request):
 
         if not user_ip:
             return JsonResponse({'error': 'User IP not provided in the request body'})
+
         project_id = "plenary-anagram-408413"
         secret_id = "fwservice"
         version_id = "latest"
@@ -58,30 +59,46 @@ def add_ip_to_firewall(request):
             credentials_object = service_account.Credentials.from_service_account_info(credentials)
             compute = build('compute', 'v1', credentials=credentials_object)
             rule_name = "mcserver"
+            
+            # Check if the IP is already in the firewall rule
             firewall_body = compute.firewalls().get(project=project_id, firewall=rule_name).execute()
             source_ranges = firewall_body.get('sourceRanges', [])
+            
+            if f"{user_ip}/32" in source_ranges:
+                return JsonResponse({'alreadyexists': "IP already exists in the firewall rule"}, status=200)
+
+            # If not, add the IP to the firewall rule
             source_ranges.append(f"{user_ip}/32")
             firewall_body['sourceRanges'] = source_ranges
 
             compute.firewalls().update(project=project_id, firewall=rule_name, body=firewall_body).execute()
-            return JsonResponse({'message': "Firewall rule updated successfully"},status=200)
+            return JsonResponse({'message': "Firewall rule updated successfully"}, status=200)
 
         except HttpError as e:
-            return JsonResponse({'error': f"Error updating firewall rule: {e.content}"},status=403)
+            return JsonResponse({'error': f"Error updating firewall rule: {e.content}"}, status=403)
 
     else:
-        return HttpResponse("Invalid request method. Use POST.",status=405)
+        return HttpResponse("Invalid request method. Use POST.", status=405)
+
 
 #do not deploy
 
 @csrf_exempt
-def add_ip_to_firewall2(request):
-    if random.choice([True, False]):
-        a = {'message': 'IP successfully added to the firewall.'}
-        c=200
+def add_ip_to_firewall2(request):   
+    if request.method=='POST':
+        if random.choice([True, False]):
+            if random.choice([True, False]):
+                a = {'message': 'IP successfully added to the firewall.'}
+                c=200
+            else:
+                a = {'alreadyexists': 'IP already exists'}
+                c=200
+        else:
+            a = {'error': 'Error adding IP to the firewall: Permission denied.'}
+            c=403
+        return JsonResponse(a,status=c)
     else:
-        a = {'error': 'Error adding IP to the firewall: Permission denied.'}
-        c=403
-    return JsonResponse(a,status=c)
+        return JsonResponse({'error':'Invalid Request Method. use POST.'},status=405)
+  
 
         

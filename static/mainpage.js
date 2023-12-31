@@ -20,13 +20,18 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
-                hiddenText.textContent = data.message || data.error;
+                hiddenText.textContent = data.message || data.error || data.alreadyexists;
                 hiddenText.style.display = 'block';
                 if (data.error) {
                 document.body.style.transition = 'background-color 0.7s ease-in-out';
                 document.body.style.backgroundColor = '#480000';     
                 hiddenText.style.color = 'yellow';
-                } else {
+                }else if(data.alreadyexists){
+                document.body.style.transition = 'background-color 0.7s ease-in-out';       
+                document.body.style.backgroundColor = '#84a98c';     
+                hiddenText.style.color = '#000000';
+                } 
+                else {
                 document.body.style.transition = 'background-color 0.7s ease-in-out';
                 document.body.style.backgroundColor = '#020047';
                 hiddenText.style.color = '#5eec4b';
