@@ -1,15 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
 
+
+.main{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center ;
+  padding: 30px
+}
+
+.catmeme{
+  height: 250px;
+  width: 500px;
+}
+.appname{
+  align-items: center;
+}
 body {
   min-height: 100vh;
   display: flex;
   background-color: #000000;
   align-items: center;
+  align-items: center ;
   justify-content: center;
   margin: 0;
   font-family: 'Lato', sans-serif;
 }
-
+.gifcont{
+  padding: 5%;
+  /* width: 200px; */
+}
 #hiddenText {
   display: none;
 }
@@ -26,6 +46,7 @@ h1 {
 
 .container {
   text-align: center;
+  padding: 30px;
 }
 
 .btn-simple {
@@ -44,9 +65,26 @@ h1 {
 }
 
 /* Media Query for Mobile Devices */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 500px) {
+  .main{
+    height: 100%;
+  }
+  .catmeme{
+    height: 150px;
+    width: 300px;
+  }
+
+  body {
+    /* min-height: 100vh; */
+    display: flex;
+    background-color: #000000;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+  }
   p {
-      font-size: 3vw; 
+      font-size: 4vw; 
       font-family: 'Lato';/* Adjust font size for smaller screens */
   }
 
@@ -54,10 +92,20 @@ h1 {
       font-size: 5vw;
       font-family: 'Lato'; /* Adjust font size for smaller screens */
   }
+  #hiddentext{
+    font-size: 2vw;
+  }
 
   .btn-simple {
-      padding: 5vw 10vw; /* Adjust padding for smaller screens */
+      padding: 10%;
+      width: 100%; /* Adjust padding for smaller screens */
       font-size: 4vw;
-      font-family: 'Lato'; /* Adjust font size for smaller screens */
+      font-family: 'Lato';
+      background-color: #000000;
+      color: rgb(255, 255, 255);
+      text-align: center;
+  }
+  .box-3{
+    padding: 3%;
   }
 }
