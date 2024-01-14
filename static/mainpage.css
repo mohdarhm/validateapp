@@ -39,6 +39,11 @@ p {
   color: white;
 }
 
+#tip{
+  font-size: 0.8vw;
+  color: rgb(192, 226, 255);
+}
+
 h1 {
   font-size: 1.6vw; /* Adjust font size for mobile */
   color: white;

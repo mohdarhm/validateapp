@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 from google.cloud import secretmanager
+from google.auth import compute_engine
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 import subprocess
@@ -101,4 +102,57 @@ def add_ip_to_firewall2(request):
         return JsonResponse({'error':'Invalid Request Method. use POST.'},status=405)
   
 
-        
+@csrf_exempt
+def getserverip(request):
+    if request.method == 'GET':
+        project_id = "plenary-anagram-408413"
+        zone = "asia-south1-c"  # Replace with the actual zone where your VM is located
+        instance_name = "mcserver"
+
+        try:
+            # Create a Compute Engine service client
+            compute = build('compute', 'v1', credentials=compute_engine.Credentials())
+
+            # Get the instance information
+            instance = compute.instances().get(project=project_id, zone=zone, instance=instance_name).execute()
+
+            # Extract the external IP address
+            network_interfaces = instance.get('networkInterfaces', [])
+            if network_interfaces:
+                access_configs = network_interfaces[0].get('accessConfigs', [])
+                if access_configs:
+                    external_ip = access_configs[0].get('natIP')
+                    return JsonResponse({'external_ip': external_ip}, status=200)
+                else:
+                    return JsonResponse({'error': 'No access configurations found for the instance'}, status=404)
+            else:
+                return JsonResponse({'error': 'No network interfaces found for the instance'}, status=404)
+
+        except Exception as e:
+            return JsonResponse({'error': f"Error retrieving external IP: {str(e)}"}, status=500)
+
+    else:
+        return JsonResponse({'error': 'Invalid request method. Use GET.'}, status=405)       
+    
+
+
+@csrf_exempt
+def getserverip2(request):
+    if request.method == 'GET':
+        success_probability = 0.8  # Adjust this probability as needed
+
+        try:
+            # Simulate success or failure randomly
+            if random.random() < success_probability:
+                # Simulate returning a random IP address
+                random_ip = f"{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}"
+                return JsonResponse({'external_ip': random_ip}, status=200)
+            else:
+                # Simulate failure
+                return JsonResponse({'error': 'Simulated failure to retrieve external IP'}, status=500)
+
+        except Exception as e:
+            return JsonResponse({'error': f"Simulated error: {str(e)}"}, status=500)
+
+    else:
+        return JsonResponse({'error': 'Invalid request method. Use GET.'}, status=405)
