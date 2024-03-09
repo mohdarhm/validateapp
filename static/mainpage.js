@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(publicData => {
         currentIpParagraph.textContent = 'Current IP: ' + publicData.ip;
 
-        // Fetch the response from the Django view for simulating local external IP
+        // Fetch Minecraft server IP
         fetch('https://plenary-anagram-408413.el.r.appspot.com/getserverip/')
         .then(response => {
             if (!response.ok) {
