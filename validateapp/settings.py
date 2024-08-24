@@ -19,6 +19,7 @@ DEBUG = False
 ALLOWED_HOSTS = ['sound-bee-386508.el.r.appspot.com','localhost','127.0.0.1']
 
 CORS_ALLOWED_ORIGINS = [
+    "https://mohdarhm.github.io/validateapp-fe2/",
 "https://idontknow-frontend-nextjs.vercel.app/",
 "http://localhost:3000",
 ]
