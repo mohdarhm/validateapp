@@ -10,26 +10,23 @@ from google.oauth2 import service_account
 from google.cloud import compute_v1
 from django.views.decorators.csrf import csrf_exempt
 import random
+import ipaddress
 
-def authenticate_with_service_account_key(key):
-    # Write the service account key to a temporary file
-    with open("/tmp/service-account-key.json", "w") as key_file:
-        key_file.write(key)
+# def authenticate_with_service_account_key(key):
+#     # Write the service account key to a temporary file
+#     with open("/tmp/service-account-key.json", "w") as key_file:
+#         key_file.write(key)
 
-    # Authenticate with gcloud using the service account key
-    subprocess.run(["gcloud", "auth", "activate-service-account", "--key-file=/tmp/service-account-key.json"])
+#     # Authenticate with gcloud using the service account key
+#     subprocess.run(["gcloud", "auth", "activate-service-account", "--key-file=/tmp/service-account-key.json"])
 
-
-
-
-def get_user_ip(request):
-    user_ip = request.META.get('HTTP_X_APPENGINE_USER_IP', None)
-    return JsonResponse({'ip': user_ip})
+# def get_user_ip(request):
+#     user_ip = request.META.get('HTTP_X_APPENGINE_USER_IP', None)
+#     return JsonResponse({'ip': user_ip})
 
 
 def homepage(request):
-    return render(request, "mainpage.html")
-
+    return HttpResponse("can't access this app from 'ere, bud")
 
 
 @csrf_exempt
@@ -37,12 +34,21 @@ def add_ip_to_firewall(request):
     if request.method == 'POST':
         data = json.loads(request.body.decode('utf-8'))
         user_ip = data.get('user_ip')
-
+        
+        # Perform initial checks
         if not user_ip:
             return JsonResponse({'error': 'User IP not provided in the request body'})
 
-        project_id = "plenary-anagram-408413"
-        secret_id = "fwservice"
+        try:
+            ip = ipaddress.ip_network(user_ip)
+            if ip.is_reserved or ip.is_loopback or ip.is_multicast or ip.is_link_local or user_ip=="0.0.0.0":
+                return JsonResponse({'error': 'Reserved IP addresses are not allowed'}, status=400)
+        except ValueError:
+            return JsonResponse({'error': 'Invalid IP address'}, status=400)
+
+
+        project_id = "sound-bee-386508"
+        secret_id = "mune"
         version_id = "latest"
 
         client = secretmanager.SecretManagerServiceClient()
@@ -59,7 +65,7 @@ def add_ip_to_firewall(request):
         try:
             credentials_object = service_account.Credentials.from_service_account_info(credentials)
             compute = build('compute', 'v1', credentials=credentials_object)
-            rule_name = "mcserver"
+            rule_name = "mune"
             
             # Check if the IP is already in the firewall rule
             firewall_body = compute.firewalls().get(project=project_id, firewall=rule_name).execute()
@@ -84,30 +90,30 @@ def add_ip_to_firewall(request):
 
 #do not deploy
 
-@csrf_exempt
-def add_ip_to_firewall2(request):   
-    if request.method=='POST':
-        if random.choice([True, False]):
-            if random.choice([True, False]):
-                a = {'message': 'IP successfully added to the firewall.'}
-                c=200
-            else:
-                a = {'alreadyexists': 'IP already exists'}
-                c=200
-        else:
-            a = {'error': 'Error adding IP to the firewall: Permission denied.'}
-            c=403
-        return JsonResponse(a,status=c)
-    else:
-        return JsonResponse({'error':'Invalid Request Method. use POST.'},status=405)
+# @csrf_exempt
+# def add_ip_to_firewall2(request):   
+#     if request.method=='POST':
+#         if random.choice([True, False]):
+#             if random.choice([True, False]):
+#                 a = {'message': 'IP successfully added to the firewall.'}
+#                 c=200
+#             else:
+#                 a = {'alreadyexists': 'IP already exists'}
+#                 c=200
+#         else:
+#             a = {'error': 'Error adding IP to the firewall: Permission denied.'}
+#             c=403
+#         return JsonResponse(a,status=c)
+#     else:
+#         return JsonResponse({'error':'Invalid Request Method. use POST.'},status=405)
   
 
 @csrf_exempt
 def getserverip(request):
     if request.method == 'GET':
-        project_id = "plenary-anagram-408413"
-        zone = "asia-south1-c"  # Replace with the actual zone where your VM is located
-        instance_name = "mcserver"
+        project_id = "sound-bee-386508"
+        zone = "asia-southeast1-b"  # Replace with the actual zone where your VM is located
+        instance_name = "instance-20240824-081409"
 
         try:
             # Create a Compute Engine service client
@@ -136,23 +142,23 @@ def getserverip(request):
     
 
 
-@csrf_exempt
-def getserverip2(request):
-    if request.method == 'GET':
-        success_probability = 0.8  # Adjust this probability as needed
+# @csrf_exempt
+# def getserverip2(request):
+#     if request.method == 'GET':
+#         success_probability = 0.8  # Adjust this probability as needed
 
-        try:
-            # Simulate success or failure randomly
-            if random.random() < success_probability:
-                # Simulate returning a random IP address
-                random_ip = f"{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}"
-                return JsonResponse({'external_ip': random_ip}, status=200)
-            else:
-                # Simulate failure
-                return JsonResponse({'error': 'Simulated failure to retrieve external IP'}, status=500)
+#         try:
+#             # Simulate success or failure randomly
+#             if random.random() < success_probability:
+#                 # Simulate returning a random IP address
+#                 random_ip = f"{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}.{random.randint(1, 255)}"
+#                 return JsonResponse({'external_ip': random_ip}, status=200)
+#             else:
+#                 # Simulate failure
+#                 return JsonResponse({'error': 'Simulated failure to retrieve external IP'}, status=500)
 
-        except Exception as e:
-            return JsonResponse({'error': f"Simulated error: {str(e)}"}, status=500)
+#         except Exception as e:
+#             return JsonResponse({'error': f"Simulated error: {str(e)}"}, status=500)
 
-    else:
-        return JsonResponse({'error': 'Invalid request method. Use GET.'}, status=405)
+#     else:
+#         return JsonResponse({'error': 'Invalid request method. Use GET.'}, status=405)
