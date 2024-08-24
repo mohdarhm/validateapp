@@ -14,14 +14,13 @@ BASE_DIR3=Path(r'C:\Users\mohda\Desktop\validate\validateapp\static')
 SECRET_KEY = 'django-insecure-r*48#j-ehv=o$q9dfgns=j%f8jphmj59k#nfcl6ow!&3964dp7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['sound-bee-386508.el.r.appspot.com','localhost','127.0.0.1']
 
-CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [
-"https://ipv4-a.jsonip.com",
-"http://localhost:8000",
+"https://idontknow-frontend-nextjs.vercel.app/",
+"http://localhost:3000",
 ]
 # Application definition
 
@@ -36,10 +35,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
